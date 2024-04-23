@@ -20,7 +20,7 @@ struct ContentView: View {
             } else {
                 // If no station is selected, present the HomeView
                 // Assuming HomeView also needs appSettings based on your app's logic
-                HomeView(viewModel: viewModel)
+                StationSelectionView(stationViewModel: viewModel, appSettings: appSettings)
             }
         }
     }
