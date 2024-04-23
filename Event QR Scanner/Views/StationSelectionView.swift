@@ -11,14 +11,15 @@ struct StationSelectionView: View {
     @ObservedObject var stationViewModel: ScanningStationViewModel
     @ObservedObject var appSettings: AppSettings
     @State private var navigateToMain = false  // State to control navigation
+    @State private var isLoading = false  // State to control the loading indicator
 
     var body: some View {
-        NavigationStack {
+        NavigationView {
             List(stationViewModel.stations, id: \.id) { station in
                 Button(action: {
                     appSettings.selectedStation = station
-                    appSettings.saveToLocal()  // Save the selection to local storage
-                    navigateToMain = true  // Set the navigation trigger
+                    appSettings.saveToLocal()
+                    navigateToMain = true
                 }) {
                     HStack {
                         Text(station.name)
@@ -29,28 +30,36 @@ struct StationSelectionView: View {
                         }
                     }
                 }
+                .background(
+                    NavigationLink("", destination: MainTabView(viewModel: stationViewModel, appSettings: appSettings), isActive: $navigateToMain)
+                )
             }
             .navigationTitle(NSLocalizedString("select_a_station", comment: "Title for selecting a station"))
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
+                        isLoading = true
                         Task {
                             await stationViewModel.fetchStations()
+                            isLoading = false
                         }
                     }) {
-                        Image(systemName: "arrow.clockwise").accessibilityLabel(NSLocalizedString("refresh", comment: "Button label for refreshing the list"))
+                        if isLoading {
+                            ProgressView()
+                        } else {
+                            Image(systemName: "arrow.clockwise").accessibilityLabel(NSLocalizedString("refresh", comment: "Button label for refreshing the list"))
+                        }
                     }
                 }
             }
             .listStyle(.plain)
-            .navigationDestination(isPresented: $navigateToMain) {
-                MainTabView(viewModel: stationViewModel, appSettings: appSettings)
-            }
         }
         .onAppear {
             if stationViewModel.stations.isEmpty {
+                isLoading = true
                 Task {
                     await stationViewModel.fetchStations()
+                    isLoading = false
                 }
             }
         }

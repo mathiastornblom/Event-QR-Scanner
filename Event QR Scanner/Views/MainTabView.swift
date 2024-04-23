@@ -12,7 +12,7 @@ struct MainTabView: View {
     @ObservedObject var appSettings: AppSettings  // Using AppSettings
 
     var body: some View {
-        NavigationStack {
+        NavigationView {
             TabView {
                 if appSettings.selectedStation != nil {
                     ScanView(stationViewModel: viewModel, appSettings: appSettings)

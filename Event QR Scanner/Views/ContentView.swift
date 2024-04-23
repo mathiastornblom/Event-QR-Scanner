@@ -12,7 +12,7 @@ struct ContentView: View {
     @StateObject var appSettings = AppSettings(scanDelay: 5, selectedStation: nil)  // Initialize AppSettings with default values
 
     var body: some View {
-        NavigationStack {
+        NavigationView {
             if viewModel.selectedStation != nil {
                 // If a station is selected, navigate to the MainTabView
                 // Pass both viewModel and appSettings to MainTabView
