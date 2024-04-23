@@ -62,7 +62,7 @@ struct ScanView: View {
         QRScannerView { scannedCode in
             Task {
                 if let currentStation = appSettings.selectedStation {
-                    await qrViewModel.processScannedCode(scannedCode, event: "EventName", scanStation: currentStation.name)
+                    await qrViewModel.processScannedCode(scannedCode, event: "USM 2024 Finalsteg", scanStation: currentStation.name)
                 }
             }
         }
