@@ -8,22 +8,29 @@
 import SwiftUI
 
 struct SplashView: View {
-    @StateObject private var stationViewModel = ScanningStationViewModel.shared // Using shared instance of the station view model.
-    @StateObject private var appSettings = AppSettings(scanDelay: 5, selectedStation: nil) // Initialize AppSettings here.
-    @State private var isActive = false // Tracks whether the splash screen should transition to the main content.
-    @State private var isDataLoaded = false // Indicates whether initial data loading is complete.
-    
+    @StateObject private var eventsViewModel = EventsViewModel()
+    @StateObject private var stationViewModel = ScanningStationViewModel.shared
+    @StateObject private var appSettings = AppSettings(scanDelay: 5, selectedStation: nil, selectedEvent: nil)
+    @State private var isActive = false
+    @State private var isDataLoaded = false
+
     var body: some View {
         VStack {
             if isActive {
-                // Conditionally navigate to either the main content or the station selection screen.
-                if let _ = stationViewModel.selectedStation {
-                    ContentView() // Navigate to the main view if a station is already selected.
-                } else {
+                // 1) If no event selected → show event picker
+                if appSettings.selectedEvent == nil {
+                    EventSelectionView(eventsVM: eventsViewModel, appSettings: appSettings)
+
+                // 2) If event selected but no station → station selection
+                } else if appSettings.selectedStation == nil {
                     StationSelectionView(stationViewModel: stationViewModel, appSettings: appSettings)
+
+                // 3) Both event & station selected → main content
+                } else {
+                    MainTabView(viewModel: stationViewModel, appSettings: appSettings)
                 }
             } else {
-                // Splash screen content with a logo and title.
+                // Splash screen content with logo and title
                 Image("AppLogo")
                     .resizable()
                     .scaledToFit()
@@ -41,9 +48,18 @@ struct SplashView: View {
         }
     }
 
+    /// Loads initial data: events and stations (if event saved), then activates navigation
     private func fetchInitialData() {
         Task {
-            await stationViewModel.fetchStations()
+            // Fetch events first
+            await eventsViewModel.fetchEvents()
+
+            // If an event was already selected (from previous run), fetch stations for it
+            if let savedEvent = appSettings.selectedEvent {
+                await stationViewModel.fetchStations(for: savedEvent)
+            }
+
+            // All data loaded, transition away from splash
             isDataLoaded = true
             withAnimation {
                 isActive = true
@@ -52,7 +68,6 @@ struct SplashView: View {
     }
 }
 
-// Provides a SwiftUI preview of SplashView.
 struct SplashView_Previews: PreviewProvider {
     static var previews: some View {
         SplashView()

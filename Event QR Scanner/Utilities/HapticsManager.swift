@@ -44,6 +44,11 @@ class HapticsManager {
             let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
             let event = CHHapticEvent(eventType: .hapticContinuous, parameters: [intensity, sharpness], relativeTime: 0, duration: 1.0)
             events.append(event)
+        case .technical:
+            let first = CHHapticEvent(eventType: .hapticTransient, parameters: [], relativeTime: 0)
+            let second = CHHapticEvent(eventType: .hapticTransient, parameters: [], relativeTime: 0.2)
+            events.append(first)
+            events.append(second)
         }
 
         do {
@@ -55,4 +60,3 @@ class HapticsManager {
         }
     }
 }
-

@@ -10,32 +10,56 @@ import Foundation
 class AppSettings: ObservableObject {
     @Published var scanDelay: Int
     @Published var selectedStation: ScanningStation?
+    @Published var selectedEvent: Event?
+    @Published var isDebugEnabled: Bool
 
-    init(scanDelay: Int, selectedStation: ScanningStation?) {
+    init(
+        scanDelay: Int,
+        selectedStation: ScanningStation?,
+        selectedEvent: Event? = nil,
+        isDebugEnabled: Bool = false
+    ) {
         self.scanDelay = scanDelay
         self.selectedStation = selectedStation
+        self.selectedEvent = selectedEvent
+        self.isDebugEnabled = isDebugEnabled
+        loadFromLocal()
     }
 
     func saveToLocal() {
         UserDefaults.standard.set(scanDelay, forKey: "scanDelay")
-        // Encode `selectedStation` and save it to UserDefaults
-        if let station = selectedStation {
-            if let encoded = try? JSONEncoder().encode(station) {
-                UserDefaults.standard.set(encoded, forKey: "selectedStation")
-            }
+        UserDefaults.standard.set(isDebugEnabled, forKey: "isDebugEnabled")
+
+        if let station = selectedStation,
+           let encStation = try? JSONEncoder().encode(station) {
+            UserDefaults.standard.set(encStation, forKey: "selectedStation")
+        }
+
+        if let event = selectedEvent,
+           let encEvent = try? JSONEncoder().encode(event) {
+            UserDefaults.standard.set(encEvent, forKey: "selectedEvent")
         }
     }
 
     func loadFromLocal() {
-        self.scanDelay = UserDefaults.standard.integer(forKey: "scanDelay")
-        // Decode `selectedStation` from UserDefaults
+        scanDelay = UserDefaults.standard.integer(forKey: "scanDelay")
+        isDebugEnabled = UserDefaults.standard.bool(forKey: "isDebugEnabled")
+
         if let data = UserDefaults.standard.data(forKey: "selectedStation"),
            let station = try? JSONDecoder().decode(ScanningStation.self, from: data) {
-            self.selectedStation = station
+            selectedStation = station
+        }
+
+        if let data = UserDefaults.standard.data(forKey: "selectedEvent"),
+           let event = try? JSONDecoder().decode(Event.self, from: data) {
+            selectedEvent = event
         }
     }
 
-    // Placeholder methods for iCloud sync - these will need to be implemented based on your iCloud setup
+    func refreshFromSystemSettings() {
+        isDebugEnabled = UserDefaults.standard.bool(forKey: "isDebugEnabled")
+    }
+
     func saveToiCloud() {
         // Implement iCloud save logic
     }

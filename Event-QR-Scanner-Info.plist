@@ -2,7 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
+	<key>API_KEY</key>
+	<string>BhYMfBsQGpwrEuT0Akv3vjxHHngRRdX4yyArcDxFgktyViPiBiuM7qQy8buVudeI7zCiweSnKQl80Jb0krxo9Gdb5zowH2jOoEasHKQUkVWrCu0hZDa0DyrN61TcCHpR5lh8MqyONsUUbI4MOpvUcHqyX5ZcWqmn1i7uBBjbnWTu0T4fYcn7DH26lgGBbUd1LRM8QMNd3SmmOAHwlcsyQ5H3lzTlqdv3kszEre5YdbA0zMzr6X4G3iAkBIRNsos4</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 </dict>
 </plist>
