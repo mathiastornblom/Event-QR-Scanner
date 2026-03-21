@@ -22,57 +22,130 @@ struct ScanView: View {
     }
 
     var body: some View {
+        GeometryReader { geo in
+            let isLandscape = geo.size.width > geo.size.height
+            if isLandscape {
+                landscapeLayout(geo: geo)
+            } else {
+                portraitLayout(geo: geo)
+            }
+        }
+        .background(Color(UIColor.systemBackground))
+    }
+
+    // MARK: - Layouts
+
+    @ViewBuilder
+    private func portraitLayout(geo: GeometryProxy) -> some View {
         VStack {
+            headerSection
+            ZStack {
+                if qrViewModel.isReadyToScanAgain {
+                    scannerView()
+                } else if let result = qrViewModel.lastScanResult {
+                    scanResultView(lastScanResult: result)
+                } else {
+                    ProgressView()
+                }
+            }
+            .frame(width: geo.size.width * 0.9, height: geo.size.height * 0.46)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.secondary, lineWidth: 2))
+            .padding(.bottom, 16)
+
+            torchRow
+        }
+        .padding()
+    }
+
+    @ViewBuilder
+    private func landscapeLayout(geo: GeometryProxy) -> some View {
+        HStack(spacing: 0) {
+            // Left panel: scanner + controls
+            VStack(spacing: 8) {
+                headerSection
+                scannerView()
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.secondary, lineWidth: 2))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                torchRow
+            }
+            .padding()
+            .frame(width: geo.size.width * 0.5)
+
+            Divider()
+
+            // Right panel: result or idle state
+            Group {
+                if let result = qrViewModel.lastScanResult {
+                    scanResultView(lastScanResult: result)
+                } else if !qrViewModel.isReadyToScanAgain {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    VStack(spacing: 12) {
+                        Image(systemName: "qrcode.viewfinder")
+                            .font(.system(size: 52))
+                            .foregroundColor(.secondary)
+                        Text(NSLocalizedString("scan_qr", comment: "Title for scanning QR codes"))
+                            .font(.headline)
+                            .foregroundColor(.secondary)
+                        Text(NSLocalizedString("point_camera_at_code", comment: "Point camera at QR code"))
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            }
+            .frame(width: geo.size.width * 0.5)
+        }
+    }
+
+    // MARK: - Shared subviews
+
+    private var headerSection: some View {
+        VStack(spacing: 0) {
             HStack {
                 Text(NSLocalizedString("scan_qr", comment: "Title for scanning QR codes"))
                     .font(.headline)
                 Spacer()
             }
-
             Button {
                 selectedTab = "settings"
             } label: {
                 EventBrandingHeaderView(
                     event: appSettings.selectedEvent,
-                    subtitle: String(format: NSLocalizedString("selected_station_format", comment: "Selected station label"), appSettings.selectedStation?.name ?? NSLocalizedString("none_selected", comment: "No selection"))
+                    subtitle: String(
+                        format: NSLocalizedString("selected_station_format", comment: "Selected station label"),
+                        appSettings.selectedStation?.name ?? NSLocalizedString("none_selected", comment: "No selection")
+                    )
                 )
             }
             .buttonStyle(.plain)
             .padding(.bottom, 8)
-
-            ZStack {
-                if qrViewModel.isReadyToScanAgain {
-                    scannerView()
-                } else if let lastScanResult = qrViewModel.lastScanResult {
-                    scanResultView(lastScanResult: lastScanResult)
-                } else {
-                    ProgressView()
-                }
-            }
-            .frame(width: UIScreen.main.bounds.width * 0.9, height: UIScreen.main.bounds.height * 0.46)
-            .clipShape(RoundedRectangle(cornerRadius: 20))
-            .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.secondary, lineWidth: 2))
-            .padding(.bottom, 16)
-
-            HStack {
-                Spacer()
-                Button {
-                    isTorchOn.toggle()
-                    TorchManager.shared.toggleTorch(on: isTorchOn)
-                } label: {
-                    Image(systemName: isTorchOn ? "flashlight.on.fill" : "flashlight.off.fill")
-                        .foregroundColor(isTorchOn ? .yellow : .gray)
-                        .imageScale(.large)
-                        .frame(minWidth: 44, minHeight: 44)
-                        .contentShape(Rectangle())
-                        .padding(4)
-                }
-                .accessibilityLabel(NSLocalizedString("toggle_flashlight", comment: "Toggle flashlight"))
-            }
         }
-        .padding()
-        .background(Color(UIColor.systemBackground))
     }
+
+    private var torchRow: some View {
+        HStack {
+            Spacer()
+            Button {
+                isTorchOn.toggle()
+                TorchManager.shared.toggleTorch(on: isTorchOn)
+            } label: {
+                Image(systemName: isTorchOn ? "flashlight.on.fill" : "flashlight.off.fill")
+                    .foregroundColor(isTorchOn ? .yellow : .gray)
+                    .imageScale(.large)
+                    .frame(minWidth: 44, minHeight: 44)
+                    .contentShape(Rectangle())
+                    .padding(4)
+            }
+            .accessibilityLabel(NSLocalizedString("toggle_flashlight", comment: "Toggle flashlight"))
+        }
+    }
+
+    // MARK: - Scanner / result views (unchanged logic)
 
     @ViewBuilder
     private func scannerView() -> some View {
@@ -126,7 +199,9 @@ struct ScanView: View {
                         Text(String(format: NSLocalizedString("used_station_format", comment: "Used station label"), consumed))
                     }
                     if lastScanResult.showRemaining {
-                        Text(lastScanResult.isValid ? String(format: NSLocalizedString("remaining_selected_station_format", comment: "Remaining selected station"), lastScanResult.scansLeft) : String(format: NSLocalizedString("remaining_after_scan_format", comment: "Remaining after scan"), lastScanResult.scansLeft))
+                        Text(lastScanResult.isValid
+                             ? String(format: NSLocalizedString("remaining_selected_station_format", comment: "Remaining selected station"), lastScanResult.scansLeft)
+                             : String(format: NSLocalizedString("remaining_after_scan_format", comment: "Remaining after scan"), lastScanResult.scansLeft))
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -171,16 +246,12 @@ struct ScanView: View {
     }
 
     private func statusIconName(for result: ScanResult) -> String {
-        if result.isTechnicalError {
-            return "exclamationmark.triangle.fill"
-        }
+        if result.isTechnicalError { return "exclamationmark.triangle.fill" }
         return result.isValid ? "checkmark.circle.fill" : "xmark.circle.fill"
     }
 
     private func statusIconColor(for result: ScanResult) -> Color {
-        if result.isTechnicalError {
-            return .yellow
-        }
+        if result.isTechnicalError { return .yellow }
         return result.isValid ? .green : .red
     }
 }

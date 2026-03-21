@@ -215,23 +215,6 @@
         }
       }
     },
-    "club_format" : {
-      "comment" : "Club label",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Club: %@"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Klubb: %@"
-          }
-        }
-      }
-    },
     "close" : {
       "comment" : "Close",
       "localizations" : {
@@ -245,6 +228,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Stäng"
+          }
+        }
+      }
+    },
+    "club_format" : {
+      "comment" : "Club label",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Club: %@"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klubb: %@"
           }
         }
       }
@@ -589,6 +589,9 @@
         }
       }
     },
+    "denied_expired" : {
+      "comment" : "Denied expired"
+    },
     "denied_no_remaining" : {
       "comment" : "Denied no quota",
       "localizations" : {
@@ -605,6 +608,12 @@
           }
         }
       }
+    },
+    "denied_no_right_assigned" : {
+      "comment" : "Denied no right assigned"
+    },
+    "denied_not_yet_valid" : {
+      "comment" : "Denied not yet valid"
     },
     "denied_outside_time_window" : {
       "comment" : "Denied outside time window",
@@ -1383,6 +1392,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "QR-skanner"
+          }
+        }
+      }
+    },
+    "point_camera_at_code" : {
+      "comment" : "Point camera at QR code",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Point the camera at a QR code to scan"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rikta kameran mot en QR-kod för att skanna"
           }
         }
       }
