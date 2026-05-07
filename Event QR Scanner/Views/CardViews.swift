@@ -80,28 +80,53 @@ struct StationCard: View {
     let station: ScanningStation
     let isSelected: Bool
 
-    /// True when validTo is set and lies in the past.
     private var isExpired: Bool {
         guard let to = parseISO(station.validTo) else { return false }
         return to < Date()
     }
 
+    private var isFuture: Bool {
+        guard let from = parseISO(station.validFrom) else { return false }
+        return from > Date()
+    }
+
+    /// Outside the validity window (either not yet started or already expired).
+    private var isOutside: Bool { isExpired || isFuture }
+
+    /// Dot colour mirrors the web PWA: blue=selected, gray=expired, yellow=future, green=active.
+    private var dotColor: Color {
+        if isSelected { return .accentColor }
+        if isExpired  { return Color(UIColor.systemGray3) }
+        if isFuture   { return .yellow }
+        return .green
+    }
+
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: isExpired ? "bolt.slash.circle" : "bolt.circle")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 34, height: 34)
-                .foregroundColor(isExpired ? .secondary : .accentColor)
 
-            VStack(alignment: .leading, spacing: 4) {
+            // Status dot — same semantic as web PWA
+            Circle()
+                .fill(dotColor)
+                .frame(width: 8, height: 8)
+                .padding(.top, 2)   // align with first text baseline
+
+            VStack(alignment: .leading, spacing: 3) {
                 Text(station.name)
                     .font(.headline)
-                    .foregroundColor(isExpired ? .secondary : .primary)
-                if let dateText = formatDateRange(start: station.validFrom, end: station.validTo) {
-                    Text(dateText)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+                    .foregroundColor(isOutside ? .secondary : .primary)
+
+                if let timeText = formatStationTimeRange(from: station.validFrom, to: station.validTo) {
+                    Group {
+                        if isExpired {
+                            Text(timeText + " · Expired")
+                        } else if isFuture {
+                            Text(timeText + " · Not yet started")
+                        } else {
+                            Text(timeText)
+                        }
+                    }
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
                 }
             }
 
@@ -109,28 +134,73 @@ struct StationCard: View {
 
             if isSelected {
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.green)
+                    .foregroundColor(.accentColor)
             }
         }
         .padding(12)
-        .background(Color(UIColor.secondarySystemBackground))
+        .background(
+            isSelected
+                ? Color.accentColor.opacity(0.12)
+                : Color(UIColor.secondarySystemBackground)
+        )
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(isSelected ? Color.green.opacity(0.6) : Color.clear, lineWidth: 1)
+                .stroke(
+                    isSelected ? Color.accentColor.opacity(0.5) : Color.clear,
+                    lineWidth: 1
+                )
         )
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .opacity(isExpired ? 0.45 : 1.0)
+        .opacity(isOutside ? 0.45 : 1.0)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(station.name)
         .accessibilityValue(stationDateAccessibility)
     }
 
     private var stationDateAccessibility: String {
-        guard let dateText = formatDateRange(start: station.validFrom, end: station.validTo) else {
+        guard let timeText = formatStationTimeRange(from: station.validFrom, to: station.validTo) else {
             return NSLocalizedString("no_date_info", comment: "No date info")
         }
-        return String(format: NSLocalizedString("station_date_format", comment: "Station date format"), dateText)
+        return String(format: NSLocalizedString("station_date_format", comment: "Station date format"), timeText)
     }
+}
+
+// MARK: - Time-range formatter (date + time, mirrors web PWA)
+
+private let stationDateFmt: DateFormatter = {
+    let f = DateFormatter()
+    f.locale = Locale(identifier: "sv_SE")
+    f.dateFormat = "d MMM"
+    return f
+}()
+
+private let stationTimeFmt: DateFormatter = {
+    let f = DateFormatter()
+    f.dateFormat = "HH:mm"
+    return f
+}()
+
+/// Returns a human-readable time range string, e.g. "1 jun  09:00 – 12:00"
+/// or "1 jun 09:00 – 2 jun 14:00" for multi-day windows.
+func formatStationTimeRange(from: String?, to: String?) -> String? {
+    let fromDate = parseISO(from)
+    let toDate   = parseISO(to)
+    guard fromDate != nil || toDate != nil else { return nil }
+
+    if let f = fromDate, let t = toDate {
+        let sameDay = Calendar.current.isDate(f, inSameDayAs: t)
+        if sameDay {
+            return "\(stationDateFmt.string(from: f))  \(stationTimeFmt.string(from: f)) – \(stationTimeFmt.string(from: t))"
+        }
+        return "\(stationDateFmt.string(from: f)) \(stationTimeFmt.string(from: f)) – \(stationDateFmt.string(from: t)) \(stationTimeFmt.string(from: t))"
+    }
+    if let f = fromDate {
+        return "From \(stationDateFmt.string(from: f)) \(stationTimeFmt.string(from: f))"
+    }
+    if let t = toDate {
+        return "Until \(stationDateFmt.string(from: t)) \(stationTimeFmt.string(from: t))"
+    }
+    return nil
 }
 
 /// Parses an ISO-8601 string (with or without fractional seconds) into a Date.

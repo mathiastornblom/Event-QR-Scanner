@@ -49,30 +49,33 @@ struct StationSelectionView: View {
     }
 
     /// Stations sorted according to the current sort order.
-    /// Expired stations (validTo in the past) always sink to the bottom.
+    /// Expired stations always sink to the bottom in both modes.
     private var sortedStations: [ScanningStation] {
         let now = Date()
+
         func isExpired(_ s: ScanningStation) -> Bool {
             guard let to = parseISO(s.validTo) else { return false }
             return to < now
         }
         func validFromDate(_ s: ScanningStation) -> Date {
-            parseISO(s.validFrom) ?? .distantFuture
+            // Stations without validFrom sort as "distant future" so they appear
+            // after those with an explicit start time but before expired ones.
+            parseISO(s.validFrom) ?? Date(timeIntervalSince1970: 32_503_680_000) // year 3000
         }
 
         switch sortOrder {
         case .byTime:
             return stationViewModel.stations.sorted {
                 let expA = isExpired($0), expB = isExpired($1)
-                if expA != expB { return !expA }           // expired sink to bottom
+                if expA != expB { return !expA }                         // expired sink to bottom
                 let dA = validFromDate($0), dB = validFromDate($1)
-                if dA != dB { return dA < dB }             // earlier validFrom first
+                if dA != dB { return dA < dB }                           // earlier validFrom first
                 return $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
             }
         case .alphabetical:
             return stationViewModel.stations.sorted {
                 let expA = isExpired($0), expB = isExpired($1)
-                if expA != expB { return !expA }           // expired sink to bottom
+                if expA != expB { return !expA }                         // expired sink to bottom
                 return $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
             }
         }
@@ -114,7 +117,9 @@ struct StationSelectionView: View {
                         ScrollView {
                             LazyVStack(spacing: 10) {
                                 ForEach(sortedStations, id: \.id) { station in
+                                    let expired = parseISO(station.validTo).map { $0 < Date() } ?? false
                                     Button(action: {
+                                        guard !expired else { return }   // expired stations cannot be selected
                                         appSettings.selectedStation = station
                                         appSettings.saveToLocal()
                                         navigateToMain = true
@@ -125,6 +130,7 @@ struct StationSelectionView: View {
                                         )
                                     }
                                     .buttonStyle(.plain)
+                                    .disabled(expired)
                                 }
                             }
                             .padding(.horizontal)
