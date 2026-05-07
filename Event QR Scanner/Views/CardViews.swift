@@ -204,12 +204,14 @@ func formatStationTimeRange(from: String?, to: String?) -> String? {
 }
 
 /// Parses an ISO-8601 string (with or without fractional seconds) into a Date.
+/// Full datetime formatters are tried first so that the date-only formatter
+/// cannot strip the time component from a full ISO timestamp.
 func parseISO(_ raw: String?) -> Date? {
     guard let raw, !raw.isEmpty else { return nil }
     let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-    return isoDateFormatterFull.date(from: trimmed)
-        ?? isoDateFormatterDateTime.date(from: trimmed)
+    return isoDateFormatterDateTime.date(from: trimmed)
         ?? isoDateFormatterDateTimeNoFraction.date(from: trimmed)
+        ?? isoDateFormatterFull.date(from: trimmed)
 }
 
 func formatDateRange(start: String?, end: String?) -> String? {
