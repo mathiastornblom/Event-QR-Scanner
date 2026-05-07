@@ -203,15 +203,15 @@ func formatStationTimeRange(from: String?, to: String?) -> String? {
     return nil
 }
 
-/// Parses an ISO-8601 string (with or without fractional seconds) into a Date.
-/// Full datetime formatters are tried first so that the date-only formatter
-/// cannot strip the time component from a full ISO timestamp.
+/// Parses an ISO-8601 string into a Date.
+/// Full datetime is tried first (preserving the time component).
+/// Date-only strings ("2024-05-07") are a last resort and parse as midnight UTC.
 func parseISO(_ raw: String?) -> Date? {
     guard let raw, !raw.isEmpty else { return nil }
-    let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-    return isoDateFormatterDateTime.date(from: trimmed)
-        ?? isoDateFormatterDateTimeNoFraction.date(from: trimmed)
-        ?? isoDateFormatterFull.date(from: trimmed)
+    let s = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+    return isoFullFmt.date(from: s)
+        ?? isoNoFracFmt.date(from: s)
+        ?? isoDateOnlyFmt.date(from: s)
 }
 
 func formatDateRange(start: String?, end: String?) -> String? {
@@ -232,25 +232,41 @@ func formatDateRange(start: String?, end: String?) -> String? {
 
 func formatDateString(_ raw: String?) -> String? {
     guard let raw, !raw.isEmpty else { return nil }
-    let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-    if let date = isoDateFormatterFull.date(from: trimmed)
-        ?? isoDateFormatterDateTime.date(from: trimmed)
-        ?? isoDateFormatterDateTimeNoFraction.date(from: trimmed) {
+    if let date = parseISO(raw) {
         return date.formatted(date: .abbreviated, time: .omitted)
     }
-    return trimmed
+    return raw.trimmingCharacters(in: .whitespacesAndNewlines)
 }
 
-private let isoDateFormatterFull: ISO8601DateFormatter = {
-    let formatter = ISO8601DateFormatter()
-    formatter.formatOptions = [.withFullDate]
-    return formatter
+// ── ISO-8601 parsing helpers ───────────────────────────────────────────────
+// DateFormatter with en_US_POSIX locale is the standard recommendation for
+// reliable ISO-8601 parsing in production iOS apps. Unlike ISO8601DateFormatter
+// with .withFullDate, explicit format strings are strict — they will NOT match
+// a full datetime string, so the time component can never be silently discarded.
+
+/// "2024-05-07T06:00:00.000Z" or "…+02:00"
+private let isoFullFmt: DateFormatter = {
+    let f = DateFormatter()
+    f.locale = Locale(identifier: "en_US_POSIX")
+    f.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXXXX"
+    return f
 }()
 
-private let isoDateFormatterDateTime: ISO8601DateFormatter = {
-    let formatter = ISO8601DateFormatter()
-    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-    return formatter
+/// "2024-05-07T06:00:00Z" or "…+02:00"  (no fractional seconds)
+private let isoNoFracFmt: DateFormatter = {
+    let f = DateFormatter()
+    f.locale = Locale(identifier: "en_US_POSIX")
+    f.dateFormat = "yyyy-MM-dd'T'HH:mm:ssXXXXX"
+    return f
+}()
+
+/// "2024-05-07" — date-only, treated as midnight UTC
+private let isoDateOnlyFmt: DateFormatter = {
+    let f = DateFormatter()
+    f.locale = Locale(identifier: "en_US_POSIX")
+    f.dateFormat = "yyyy-MM-dd"
+    f.timeZone = TimeZone(secondsFromGMT: 0)
+    return f
 }()
 
 struct EmptyStateView: View {
@@ -301,8 +317,3 @@ struct EmptyStateView: View {
     }
 }
 
-private let isoDateFormatterDateTimeNoFraction: ISO8601DateFormatter = {
-    let formatter = ISO8601DateFormatter()
-    formatter.formatOptions = [.withInternetDateTime]
-    return formatter
-}()
