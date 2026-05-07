@@ -7,15 +7,79 @@
 
 import SwiftUI
 
+// MARK: - Sort order
+
+enum StationSortOrder: String {
+    /// Sort by validFrom ascending; stations without a date go last.
+    case byTime = "byTime"
+    /// Sort alphabetically by name.
+    case alphabetical = "alphabetical"
+
+    var next: StationSortOrder {
+        self == .byTime ? .alphabetical : .byTime
+    }
+
+    var iconName: String {
+        switch self {
+        case .byTime:        return "clock"
+        case .alphabetical:  return "textformat.abc"
+        }
+    }
+
+    var accessibilityLabel: String {
+        switch self {
+        case .byTime:       return NSLocalizedString("sort_by_time", comment: "Sort by time")
+        case .alphabetical: return NSLocalizedString("sort_alphabetically", comment: "Sort alphabetically")
+        }
+    }
+}
+
+// MARK: - View
+
 struct StationSelectionView: View {
-    @ObservedObject var stationViewModel: ScanningStationViewModel
-    @ObservedObject var appSettings: AppSettings
+    var stationViewModel: ScanningStationViewModel
+    var appSettings: AppSettings
     @Environment(\.dismiss) private var dismiss
     @State private var navigateToMain = false
     @State private var isLoading = false
+    @AppStorage("StationSortOrder") private var sortOrderRaw: String = StationSortOrder.byTime.rawValue
+
+    private var sortOrder: StationSortOrder {
+        StationSortOrder(rawValue: sortOrderRaw) ?? .byTime
+    }
+
+    /// Stations sorted according to the current sort order.
+    /// Expired stations (validTo in the past) always sink to the bottom.
+    private var sortedStations: [ScanningStation] {
+        let now = Date()
+        func isExpired(_ s: ScanningStation) -> Bool {
+            guard let to = parseISO(s.validTo) else { return false }
+            return to < now
+        }
+        func validFromDate(_ s: ScanningStation) -> Date {
+            parseISO(s.validFrom) ?? .distantFuture
+        }
+
+        switch sortOrder {
+        case .byTime:
+            return stationViewModel.stations.sorted {
+                let expA = isExpired($0), expB = isExpired($1)
+                if expA != expB { return !expA }           // expired sink to bottom
+                let dA = validFromDate($0), dB = validFromDate($1)
+                if dA != dB { return dA < dB }             // earlier validFrom first
+                return $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+            }
+        case .alphabetical:
+            return stationViewModel.stations.sorted {
+                let expA = isExpired($0), expB = isExpired($1)
+                if expA != expB { return !expA }           // expired sink to bottom
+                return $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+            }
+        }
+    }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 0) {
                 EventBrandingHeaderView(event: appSettings.selectedEvent, subtitle: NSLocalizedString("select_station", comment: "Select station"))
                     .padding([.horizontal, .top])
@@ -49,7 +113,7 @@ struct StationSelectionView: View {
                     } else {
                         ScrollView {
                             LazyVStack(spacing: 10) {
-                                ForEach(stationViewModel.stations, id: \.id) { station in
+                                ForEach(sortedStations, id: \.id) { station in
                                     Button(action: {
                                         appSettings.selectedStation = station
                                         appSettings.saveToLocal()
@@ -65,9 +129,9 @@ struct StationSelectionView: View {
                             }
                             .padding(.horizontal)
                             .padding(.top, 4)
-                            .background(
-                                NavigationLink("", destination: MainTabView(viewModel: stationViewModel, appSettings: appSettings), isActive: $navigateToMain)
-                            )
+                            .navigationDestination(isPresented: $navigateToMain) {
+                                MainTabView(viewModel: stationViewModel, appSettings: appSettings)
+                            }
                         }
                         lastUpdatedView
                     }
@@ -79,6 +143,15 @@ struct StationSelectionView: View {
             }
             .navigationTitle(NSLocalizedString("select_station", comment: "Select station"))
             .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    // Sort toggle: cycles between byTime and alphabetical
+                    Button {
+                        sortOrderRaw = sortOrder.next.rawValue
+                    } label: {
+                        Image(systemName: sortOrder.iconName)
+                            .accessibilityLabel(sortOrder.accessibilityLabel)
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
                         Task {

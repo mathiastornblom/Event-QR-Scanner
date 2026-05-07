@@ -6,19 +6,21 @@
 //
 
 import Foundation
+import Observation
 
+@Observable
 @MainActor
-class ScanningStationViewModel: ObservableObject {
-    @Published var currentEvent: Event?
-    @Published var stations: [ScanningStation] = []
-    @Published var selectedStation: ScanningStation?
+class ScanningStationViewModel {
+    var currentEvent: Event?
+    var stations: [ScanningStation] = []
+    var selectedStation: ScanningStation?
 
     // Debug state for right loading.
-    @Published var lastRequestedEventId: String?
-    @Published var lastFetchStatus: String = "idle"
-    @Published var lastFetchError: String?
-    @Published var lastFetchedCodeCount: Int = 0
-    @Published var lastFetchAt: Date?
+    var lastRequestedEventId: String?
+    var lastFetchStatus: String = "idle"
+    var lastFetchError: String?
+    var lastFetchedCodeCount: Int = 0
+    var lastFetchAt: Date?
 
     static let shared = ScanningStationViewModel()
 
@@ -50,8 +52,8 @@ class ScanningStationViewModel: ObservableObject {
 
         do {
             let rights = try await apiClient.fetchRights(eventId: eventId)
+            // Sorting is handled by the view so it can be changed without re-fetching
             stations = rights
-                .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
                 .map { right in
                     ScanningStation(
                         id: right.id,

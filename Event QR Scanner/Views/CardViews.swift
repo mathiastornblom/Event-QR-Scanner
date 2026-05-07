@@ -80,18 +80,24 @@ struct StationCard: View {
     let station: ScanningStation
     let isSelected: Bool
 
+    /// True when validTo is set and lies in the past.
+    private var isExpired: Bool {
+        guard let to = parseISO(station.validTo) else { return false }
+        return to < Date()
+    }
+
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: "bolt.circle")
+            Image(systemName: isExpired ? "bolt.slash.circle" : "bolt.circle")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 34, height: 34)
-                .foregroundColor(.accentColor)
+                .foregroundColor(isExpired ? .secondary : .accentColor)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(station.name)
                     .font(.headline)
-                    .foregroundColor(.primary)
+                    .foregroundColor(isExpired ? .secondary : .primary)
                 if let dateText = formatDateRange(start: station.validFrom, end: station.validTo) {
                     Text(dateText)
                         .font(.subheadline)
@@ -113,6 +119,7 @@ struct StationCard: View {
                 .stroke(isSelected ? Color.green.opacity(0.6) : Color.clear, lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        .opacity(isExpired ? 0.45 : 1.0)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(station.name)
         .accessibilityValue(stationDateAccessibility)
@@ -124,6 +131,15 @@ struct StationCard: View {
         }
         return String(format: NSLocalizedString("station_date_format", comment: "Station date format"), dateText)
     }
+}
+
+/// Parses an ISO-8601 string (with or without fractional seconds) into a Date.
+func parseISO(_ raw: String?) -> Date? {
+    guard let raw, !raw.isEmpty else { return nil }
+    let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+    return isoDateFormatterFull.date(from: trimmed)
+        ?? isoDateFormatterDateTime.date(from: trimmed)
+        ?? isoDateFormatterDateTimeNoFraction.date(from: trimmed)
 }
 
 func formatDateRange(start: String?, end: String?) -> String? {
