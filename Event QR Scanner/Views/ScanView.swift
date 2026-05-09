@@ -8,17 +8,17 @@
 import SwiftUI
 
 struct ScanView: View {
-    @ObservedObject var stationViewModel: ScanningStationViewModel
-    @ObservedObject var appSettings: AppSettings
+    var stationViewModel: ScanningStationViewModel
+    var appSettings: AppSettings
     @Binding var selectedTab: String
-    @StateObject var qrViewModel: QRCodeProcessingViewModel
+    @State var qrViewModel: QRCodeProcessingViewModel
     @State private var isTorchOn = false
 
     init(stationViewModel: ScanningStationViewModel, appSettings: AppSettings, selectedTab: Binding<String>) {
         self.stationViewModel = stationViewModel
         self.appSettings = appSettings
         self._selectedTab = selectedTab
-        _qrViewModel = StateObject(wrappedValue: QRCodeProcessingViewModel(appSettings: appSettings, historyStore: .shared))
+        _qrViewModel = State(wrappedValue: QRCodeProcessingViewModel(appSettings: appSettings, historyStore: .shared))
     }
 
     var body: some View {

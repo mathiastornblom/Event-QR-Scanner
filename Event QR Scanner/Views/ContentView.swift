@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject var viewModel = ScanningStationViewModel.shared  // Use the shared instance
-    @StateObject var appSettings = AppSettings(scanDelay: 5, selectedStation: nil)  // Initialize AppSettings with default values
+    @State var viewModel = ScanningStationViewModel.shared  // Use the shared instance
+    @State var appSettings = AppSettings(scanDelay: 5, selectedStation: nil)  // Initialize AppSettings with default values
 
     var body: some View {
         NavigationView {

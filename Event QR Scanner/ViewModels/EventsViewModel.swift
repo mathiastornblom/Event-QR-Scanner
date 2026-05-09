@@ -7,14 +7,16 @@
 //
 
 import Foundation
+import Observation
 
+@Observable
 @MainActor
-class EventsViewModel: ObservableObject {
-    @Published var events: [Event] = []
-    @Published var isLoading = false
-    @Published var lastErrorMessage: String?
-    @Published var lastErrorDetail: String?
-    @Published var lastFetchAt: Date?
+class EventsViewModel {
+    var events: [Event] = []
+    var isLoading = false
+    var lastErrorMessage: String?
+    var lastErrorDetail: String?
+    var lastFetchAt: Date?
 
     private let apiClient: APIClient
 

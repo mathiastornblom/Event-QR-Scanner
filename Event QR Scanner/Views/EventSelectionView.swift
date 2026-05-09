@@ -9,13 +9,13 @@
 import SwiftUI
 
 struct EventSelectionView: View {
-    @ObservedObject var eventsVM: EventsViewModel
-    @ObservedObject var appSettings: AppSettings
+    var eventsVM: EventsViewModel
+    var appSettings: AppSettings
     @State private var isLoading = false
     @State private var navigate = false
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 Section {
                     EventBrandingHeaderView(event: appSettings.selectedEvent, subtitle: NSLocalizedString("select_event", comment: "Select event"))
@@ -90,12 +90,12 @@ struct EventSelectionView: View {
                     }.disabled(appSettings.selectedEvent == nil)
                 }
             }
-            .background(
-                NavigationLink("", destination: StationSelectionView(
+            .navigationDestination(isPresented: $navigate) {
+                StationSelectionView(
                     stationViewModel: .shared,
                     appSettings: appSettings
-                ), isActive: $navigate)
-            )
+                )
+            }
             .onAppear {
                 if eventsVM.events.isEmpty {
                     Task {
@@ -104,7 +104,7 @@ struct EventSelectionView: View {
                     }
                 }
             }
-            .onChange(of: appSettings.selectedEvent) { newEvent in
+            .onChange(of: appSettings.selectedEvent) { _, newEvent in
                 appSettings.selectedStation = nil
                 appSettings.saveToLocal()
 

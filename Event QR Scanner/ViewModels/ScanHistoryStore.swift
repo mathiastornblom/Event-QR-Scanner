@@ -4,12 +4,14 @@
 //
 
 import Foundation
+import Observation
 
+@Observable
 @MainActor
-final class ScanHistoryStore: ObservableObject {
+final class ScanHistoryStore {
     static let shared = ScanHistoryStore()
 
-    @Published private(set) var items: [ScanHistoryItem] = []
+    private(set) var items: [ScanHistoryItem] = []
 
     private let storageKey = "scanHistory"
     private let maxItems = 200

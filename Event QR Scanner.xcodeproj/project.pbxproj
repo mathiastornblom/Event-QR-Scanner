@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 73;
+	objectVersion = 100;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -92,10 +92,8 @@
 /* Begin PBXFrameworksBuildPhase section */
 		5F0E43372BCDAF2D00E60370 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
@@ -247,8 +245,6 @@
 			);
 			buildRules = (
 			);
-			dependencies = (
-			);
 			name = "Event QR Scanner";
 			productName = "Event QR Scanner";
 			productReference = 5F0E433A2BCDAF2D00E60370 /* Event QR Scanner.app */;
@@ -279,7 +275,7 @@
 				Base,
 			);
 			mainGroup = 5F0E43312BCDAF2D00E60370;
-			preferredProjectObjectVersion = 73;
+			preferredProjectObjectVersion = 100;
 			productRefGroup = 5F0E433B2BCDAF2D00E60370 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -292,7 +288,6 @@
 /* Begin PBXResourcesBuildPhase section */
 		5F0E43382BCDAF2D00E60370 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 				5F0E437E2BCDB12700E60370 /* PrivacyInfo.xcprivacy in Resources */,
 				5F0E43732BCDB02600E60370 /* successTone.mp3 in Resources */,
@@ -304,14 +299,12 @@
 				5F0E43722BCDB02600E60370 /* failureTone.mp3 in Resources */,
 				5F9FCC612F659ADF005F15A6 /* Settings.bundle in Resources */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		5F0E43362BCDAF2D00E60370 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 				5F0E435E2BCDAFB700E60370 /* StationSelectionView.swift in Sources */,
 				5F0E43422BCDAF2D00E60370 /* Item.swift in Sources */,
@@ -342,12 +335,11 @@
 				5F9FCC632F660953005F15A6 /* ScanHistoryStore.swift in Sources */,
 				5F0E436C2BCDAFE700E60370 /* AppSettings.swift in Sources */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		5F0E43482BCDAF2E00E60370 /* Debug */ = {
+		5F0E43482BCDAF2E00E60370 /* Debug configuration for PBXProject "Event QR Scanner" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -402,7 +394,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -415,7 +407,7 @@
 			};
 			name = Debug;
 		};
-		5F0E43492BCDAF2E00E60370 /* Release */ = {
+		5F0E43492BCDAF2E00E60370 /* Release configuration for PBXProject "Event QR Scanner" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -464,7 +456,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -476,7 +468,7 @@
 			};
 			name = Release;
 		};
-		5F0E434B2BCDAF2E00E60370 /* Debug */ = {
+		5F0E434B2BCDAF2E00E60370 /* Debug configuration for PBXNativeTarget "Event QR Scanner" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -496,7 +488,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -514,7 +506,7 @@
 			};
 			name = Debug;
 		};
-		5F0E434C2BCDAF2E00E60370 /* Release */ = {
+		5F0E434C2BCDAF2E00E60370 /* Release configuration for PBXNativeTarget "Event QR Scanner" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -534,7 +526,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -558,19 +550,17 @@
 		5F0E43352BCDAF2D00E60370 /* Build configuration list for PBXProject "Event QR Scanner" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				5F0E43482BCDAF2E00E60370 /* Debug */,
-				5F0E43492BCDAF2E00E60370 /* Release */,
+				5F0E43482BCDAF2E00E60370 /* Debug configuration for PBXProject "Event QR Scanner" */,
+				5F0E43492BCDAF2E00E60370 /* Release configuration for PBXProject "Event QR Scanner" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		5F0E434A2BCDAF2E00E60370 /* Build configuration list for PBXNativeTarget "Event QR Scanner" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				5F0E434B2BCDAF2E00E60370 /* Debug */,
-				5F0E434C2BCDAF2E00E60370 /* Release */,
+				5F0E434B2BCDAF2E00E60370 /* Debug configuration for PBXNativeTarget "Event QR Scanner" */,
+				5F0E434C2BCDAF2E00E60370 /* Release configuration for PBXNativeTarget "Event QR Scanner" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */

@@ -2,6 +2,7 @@
   "sourceLanguage" : "en",
   "strings" : {
     "" : {
+      "extractionState" : "stale",
       "localizations" : {
         "sv" : {
           "stringUnit" : {
@@ -1362,6 +1363,23 @@
         }
       }
     },
+    "point_camera_at_code" : {
+      "comment" : "Point camera at QR code",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Point the camera at a QR code to scan"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rikta kameran mot en QR-kod för att skanna"
+          }
+        }
+      }
+    },
     "qr_code_data" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1392,23 +1410,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "QR-skanner"
-          }
-        }
-      }
-    },
-    "point_camera_at_code" : {
-      "comment" : "Point camera at QR code",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Point the camera at a QR code to scan"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rikta kameran mot en QR-kod för att skanna"
           }
         }
       }
@@ -1990,6 +1991,12 @@
           }
         }
       }
+    },
+    "sort_alphabetically" : {
+      "comment" : "Sort alphabetically"
+    },
+    "sort_by_time" : {
+      "comment" : "Sort by time"
     },
     "station_date_format" : {
       "comment" : "Station date format",

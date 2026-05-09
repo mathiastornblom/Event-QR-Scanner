@@ -6,11 +6,13 @@
 //
 
 import Foundation
+import Observation
 
+@Observable
 @MainActor
-class QRCodeProcessingViewModel: ObservableObject {
-    @Published var lastScanResult: ScanResult?
-    @Published var isReadyToScanAgain = true
+class QRCodeProcessingViewModel {
+    var lastScanResult: ScanResult?
+    var isReadyToScanAgain = true
 
     private let appSettings: AppSettings
     private let apiClient: APIClient

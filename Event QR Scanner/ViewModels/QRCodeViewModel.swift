@@ -6,10 +6,12 @@
 //
 
 import Foundation
+import Observation
 
+@Observable
 @MainActor
-class QRCodeViewModel: ObservableObject {
-    @Published var lastScanResult: ScanResult?
+class QRCodeViewModel {
+    var lastScanResult: ScanResult?
 
     private let apiClient: APIClient
 

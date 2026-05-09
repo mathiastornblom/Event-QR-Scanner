@@ -6,9 +6,9 @@
 import SwiftUI
 
 struct CodeLookupView: View {
-    @ObservedObject var appSettings: AppSettings
+    var appSettings: AppSettings
     @Binding var selectedTab: String
-    @StateObject private var viewModel = CodeLookupViewModel()
+    @State private var viewModel = CodeLookupViewModel()
     @State private var manualCode = ""
     @State private var isResultSheetPresented = false
 
@@ -22,7 +22,7 @@ struct CodeLookupView: View {
             }
         }
         .background(Color(UIColor.systemBackground))
-        .onChange(of: hasResultOrError) { _ in
+        .onChange(of: hasResultOrError) {
             updateResultSheet()
         }
         .sheet(isPresented: $isResultSheetPresented, onDismiss: {

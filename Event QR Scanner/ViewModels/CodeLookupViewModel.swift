@@ -4,13 +4,15 @@
 //
 
 import Foundation
+import Observation
 
+@Observable
 @MainActor
-final class CodeLookupViewModel: ObservableObject {
-    @Published var result: VerifyScanResponse?
-    @Published var isLoading = false
-    @Published var errorMessage: String?
-    @Published var debugMessage: String?
+final class CodeLookupViewModel {
+    var result: VerifyScanResponse?
+    var isLoading = false
+    var errorMessage: String?
+    var debugMessage: String?
 
     private let apiClient: APIClient
 

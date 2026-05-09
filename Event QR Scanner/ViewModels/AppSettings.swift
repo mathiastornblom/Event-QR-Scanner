@@ -6,12 +6,15 @@
 //
 
 import Foundation
+import Observation
 
-class AppSettings: ObservableObject {
-    @Published var scanDelay: Int
-    @Published var selectedStation: ScanningStation?
-    @Published var selectedEvent: Event?
-    @Published var isDebugEnabled: Bool
+@Observable
+@MainActor
+class AppSettings {
+    var scanDelay: Int
+    var selectedStation: ScanningStation?
+    var selectedEvent: Event?
+    var isDebugEnabled: Bool
 
     init(
         scanDelay: Int,

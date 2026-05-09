@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct MainTabView: View {
-    @ObservedObject var viewModel: ScanningStationViewModel
-    @ObservedObject var appSettings: AppSettings
+    var viewModel: ScanningStationViewModel
+    var appSettings: AppSettings
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var selectedTab = "scan"
     // List(selection:) on iOS requires an optional binding
@@ -43,7 +43,7 @@ struct MainTabView: View {
             }
             .navigationTitle(NSLocalizedString("app_name", comment: "App name"))
             .listStyle(.sidebar)
-            .onChange(of: sidebarSelection) { newValue in
+            .onChange(of: sidebarSelection) { _, newValue in
                 if let tab = newValue { selectedTab = tab }
             }
         } detail: {

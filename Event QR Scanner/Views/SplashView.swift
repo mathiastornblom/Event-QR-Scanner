@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct SplashView: View {
-    @StateObject private var eventsViewModel = EventsViewModel()
-    @StateObject private var stationViewModel = ScanningStationViewModel.shared
-    @StateObject private var appSettings = AppSettings(scanDelay: 5, selectedStation: nil, selectedEvent: nil)
+    @State private var eventsViewModel = EventsViewModel()
+    @State private var stationViewModel = ScanningStationViewModel.shared
+    @State private var appSettings = AppSettings(scanDelay: 5, selectedStation: nil, selectedEvent: nil)
     @State private var isActive = false
     @State private var isDataLoaded = false
 

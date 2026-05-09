@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @ObservedObject var stationViewModel: ScanningStationViewModel
-    @ObservedObject var appSettings: AppSettings
+    var stationViewModel: ScanningStationViewModel
+    @Bindable var appSettings: AppSettings
     @Binding var selectedTab: String
-    @StateObject private var eventsViewModel = EventsViewModel()
+    @State private var eventsViewModel = EventsViewModel()
     @State private var isLoadingStations = false
 
     var body: some View {
@@ -125,7 +125,7 @@ struct SettingsView: View {
                     }
                 }
             }
-            .onChange(of: appSettings.selectedEvent) { newEvent in
+            .onChange(of: appSettings.selectedEvent) { _, newEvent in
                 Task {
                     // Clear selected station, then reload stations for new event
                     appSettings.selectedStation = nil

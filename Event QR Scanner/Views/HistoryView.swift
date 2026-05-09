@@ -6,8 +6,8 @@
 import SwiftUI
 
 struct HistoryView: View {
-    @ObservedObject var historyStore: ScanHistoryStore
-    @ObservedObject var appSettings: AppSettings
+    var historyStore: ScanHistoryStore
+    var appSettings: AppSettings
     @State private var showingClearConfirmation = false
     @State private var showingClearAllConfirmation = false
 
